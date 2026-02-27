@@ -1,0 +1,40 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# Use bin/rails credentials:show to access the following secrets
+#
+# amazon:
+#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+#   region: us-east-1
+#   bucket: your_own_bucket
+
+# Remember not to checkin your GCS keyring to a public repo.
+# google:
+#   credentials: <%= Rails.root.join("path/to/gcs/keyring.json") %>
+#   project: your_project
+#   bucket: your_own_bucket
+
+# microsoft:
+#   storage_account_name: your_storage_account_name
+#   storage_access_key: <%= Rails.application.credentials.dig(:azure, :storage_access_key) %>
+#   container: your_container_name
+
+# mirror:
+#   service: S3
+#   credentials:
+#     access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+#     secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+#     region: us-east-1
+#     bucket: your_own_bucket
+#   service: GCS
+#   credentials:
+#     project: your_project
+#     keyring: <%= Rails.root.join("path/to/gcs/keyring.json") %>
+#   service: Disk
+#   root: <%= Rails.root.join("tmp/storage") %>

@@ -1,0 +1,2 @@
+module ColonyMapHelper
+end

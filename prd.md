@@ -199,19 +199,19 @@ Minimal authentication (optional for MVP)
 
 Frontend:
 
-Ruby on Rails
+Next.js / React
 
 Backend:
 
-Ruby on Rails
+Node.js API routes
 
 Database:
 
-PostgreSQL
+Supabase / PostgreSQL
 
 Storage:
 
-Active storage
+Supabase storage (for images)
 
 AI:
 

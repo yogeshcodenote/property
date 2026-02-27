@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #11d473;
+  --color-primary-hover: #0ec46a;
+  --color-background-light: #f6f8f7;
+  --color-background-dark: #102219;
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  body {
+    @apply font-display text-slate-900 bg-background-light;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-slate-900 font-semibold px-4 py-2 rounded-lg hover:bg-[#0ec46a] transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-white border border-slate-200 text-slate-700 font-medium px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 text-white font-medium px-4 py-2 rounded-lg hover:bg-red-700 transition-colors;
+  }
+  
+  .card {
+    @apply bg-white border border-slate-200 rounded-xl shadow-sm;
+  }
+  
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors;
+  }
+  
+  .sidebar-link-active {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary border-l-4 border-primary;
+  }
+  
+  .input-field {
+    @apply w-full rounded-lg border-slate-200 bg-slate-50 text-sm focus:border-primary focus:ring-primary h-10;
+  }
+  
+  .badge {
+    @apply px-2 py-1 text-xs font-semibold rounded-full;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-700;
+  }
+  
+  .badge-danger {
+    @apply bg-red-100 text-red-700;
+  }
+  
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-700;
+  }
+}

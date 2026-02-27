@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PropSales AI</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+    
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .material-symbols-outlined-filled {
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen bg-background-light font-display">
+    <div class="flex h-screen overflow-hidden">
+      <!-- Sidebar Navigation -->
+      <aside class="w-64 border-r border-slate-200 bg-white flex flex-col">
+        <div class="p-6 flex items-center gap-3">
+          <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-white">home_work</span>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold tracking-tight text-slate-900">PropSales AI</h1>
+            <p class="text-xs text-slate-500">Management Portal</p>
+          </div>
+        </div>
+        
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+          <% if user_signed_in? && current_user.admin_user? %>
+            <!-- Admin Navigation -->
+            <%= link_to root_path, class: current_page?(root_path) ? 'sidebar-link-active' : 'sidebar-link' do %>
+              <span class="material-symbols-outlined<%= ' material-symbols-outlined-filled' if current_page?(root_path) %>">dashboard</span>
+              <span class="text-sm font-medium">Dashboard</span>
+            <% end %>
+
+            <%= link_to properties_path, class: current_page?(properties_path) ? 'sidebar-link-active' : 'sidebar-link' do %>
+              <span class="material-symbols-outlined<%= ' material-symbols-outlined-filled' if current_page?(properties_path) %>">domain</span>
+              <span class="text-sm font-medium">Properties</span>
+            <% end %>
+
+            <%= link_to colony_map_path, class: current_page?(colony_map_path) ? 'sidebar-link-active' : 'sidebar-link' do %>
+              <span class="material-symbols-outlined<%= ' material-symbols-outlined-filled' if current_page?(colony_map_path) %>">map</span>
+              <span class="text-sm font-medium">Colony Map</span>
+            <% end %>
+
+            <%= link_to buyers_path, class: current_page?(buyers_path) ? 'sidebar-link-active' : 'sidebar-link' do %>
+              <span class="material-symbols-outlined<%= ' material-symbols-outlined-filled' if current_page?(buyers_path) %>">group</span>
+              <span class="text-sm font-medium">Buyers</span>
+            <% end %>
+
+            <%= link_to ai_generator_description_path(property_id: Property.first&.id || 1), class: current_page?(ai_generator_description_path) ? 'sidebar-link-active' : 'sidebar-link' do %>
+              <span class="material-symbols-outlined<%= ' material-symbols-outlined-filled' if current_page?(ai_generator_description_path) %>">magic_button</span>
+              <span class="text-sm font-medium">AI Marketing</span>
+            <% end %>
+          <% elsif user_signed_in? && current_user.buyer_user? %>
+            <!-- Buyer Navigation -->
+            <%= link_to properties_path, class: current_page?(properties_path) ? 'sidebar-link-active' : 'sidebar-link' do %>
+              <span class="material-symbols-outlined<%= ' material-symbols-outlined-filled' if current_page?(properties_path) %>">domain</span>
+              <span class="text-sm font-medium">Available Properties</span>
+            <% end %>
+            
+            <div class="mt-4 px-3 py-2 bg-blue-50 rounded-lg border border-blue-200">
+              <p class="text-xs text-blue-800 font-semibold mb-1">Buyer Access</p>
+              <p class="text-[10px] text-blue-600">You can view available properties. Contact admin for more access.</p>
+            </div>
+          <% end %>
+        </nav>
+        
+        <div class="p-4 border-t border-slate-200">
+          <% if user_signed_in? %>
+            <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl mb-3">
+              <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                <span class="text-xs font-bold text-white"><%= current_user.email[0].upcase %></span>
+              </div>
+              <div class="flex-1 overflow-hidden">
+                <p class="text-xs font-semibold truncate"><%= current_user.email %></p>
+                <p class="text-[10px] text-slate-500 capitalize"><%= current_user.role %></p>
+              </div>
+            </div>
+            <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-slate-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full text-left" do %>
+              <span class="material-symbols-outlined">logout</span>
+              <span class="text-sm font-medium">Logout</span>
+            <% end %>
+          <% else %>
+            <%= link_to new_user_session_path, class: "flex items-center justify-center gap-2 w-full py-2 px-4 bg-primary text-slate-900 rounded-lg font-semibold hover:bg-primary/90 transition-colors" do %>
+              <span class="material-symbols-outlined">login</span>
+              Sign In
+            <% end %>
+          <% end %>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Header -->
+        <header class="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8">
+          <div class="flex items-center gap-4 bg-slate-100 px-3 py-1.5 rounded-full w-96">
+            <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+            <input class="bg-transparent border-none focus:ring-0 text-sm w-full p-0" placeholder="Search properties, buyers, or transactions..." type="text"/>
+          </div>
+          <div class="flex items-center gap-4">
+            <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+              <span class="material-symbols-outlined">notifications</span>
+            </button>
+          </div>
+        </header>
+        
+        <!-- Dashboard Content -->
+        <div class="flex-1 overflow-y-auto p-8">
+          <% if notice %>
+            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+              <span class="material-symbols-outlined text-green-600">check_circle</span>
+              <p class="text-sm text-green-800"><%= notice %></p>
+            </div>
+          <% end %>
+
+          <% if alert %>
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+              <span class="material-symbols-outlined text-red-600">error</span>
+              <p class="text-sm text-red-800"><%= alert %></p>
+            </div>
+          <% end %>
+
+          <%= yield %>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

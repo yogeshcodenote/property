@@ -1,0 +1,160 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-3xl font-bold tracking-tight text-slate-900">AI Marketing Center</h2>
+      <p class="text-slate-500 mt-1">Generate high-converting copy and social posts in seconds.</p>
+    </div>
+    <%= link_to property_path(@property), class: "btn-secondary flex items-center gap-2" do %>
+      <span class="material-symbols-outlined">arrow_back</span>
+      Back to Property
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+  <!-- Left Side: Configuration -->
+  <div class="lg:col-span-5 space-y-6">
+    <!-- Property Info -->
+    <div class="card p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-green-600">home</span>
+        </div>
+        <div>
+          <h3 class="font-semibold text-slate-900"><%= @property.title %></h3>
+          <p class="text-sm text-slate-500"><%= @property.colony_name %> - Plot <%= @property.plot_number %></p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <p class="text-xs text-slate-500">Size</p>
+          <p class="text-sm font-semibold text-slate-900"><%= number_with_delimiter(@property.size) %> sq ft</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500">Price</p>
+          <p class="text-sm font-semibold text-slate-900">₹<%= number_with_delimiter(@property.price) %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generation Settings -->
+    <div class="card p-6">
+      <h3 class="text-lg font-semibold mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">tune</span>
+        Generation Settings
+      </h3>
+      
+      <%= form_with url: ai_generate_description_path(@property), method: :post, local: true, html: { data: { turbo: false } } do |f| %>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium mb-2 text-slate-700">Amenities</label>
+            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+            <input type="text" name="amenities"
+                   class="input-field"
+                   placeholder="e.g., swimming pool, gym, park"
+                   value="prime location, modern amenities, excellent connectivity">
+          </div>
+
+          <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-slate-900 font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            Generate Marketing Kit
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Right Side: Results -->
+  <div class="lg:col-span-7">
+    <div class="card min-h-[600px] flex flex-col">
+      <!-- Tabs -->
+      <div class="flex border-b border-slate-100">
+        <button class="px-6 py-4 text-sm font-semibold border-b-2 border-primary text-primary">Description</button>
+      </div>
+      
+      <!-- Content Area -->
+      <div class="p-8 flex-1">
+        <% if @professional.present? %>
+          <%# Clear session after displaying %>
+          <% session.delete(:generated_description) %>
+          
+          <div class="flex items-center justify-between mb-6">
+            <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full">
+              AI Generated • Luxury Tone
+            </span>
+            <button class="flex items-center gap-2 text-sm font-semibold text-primary bg-primary/10 px-4 py-2 rounded-lg hover:bg-primary/20 transition-colors"
+                    onclick="copyAllDescriptions()">
+              <span class="material-symbols-outlined text-lg">content_copy</span>
+              Copy All
+            </button>
+          </div>
+          
+          <div class="space-y-6">
+            <!-- Professional Description -->
+            <div class="p-4 rounded-xl border border-slate-200">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-blue-600">description</span>
+                <h4 class="font-semibold text-slate-900">Professional Listing Description</h4>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-lg">
+                <p class="text-sm text-slate-700 leading-relaxed"><%= @professional %></p>
+              </div>
+              <button class="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
+                      onclick="navigator.clipboard.writeText('<%= j @professional %>'); alert('Copied!');">
+                <span class="material-symbols-outlined text-sm align-middle">content_copy</span> Copy
+              </button>
+            </div>
+            
+            <!-- WhatsApp Version -->
+            <div class="p-4 rounded-xl border border-slate-200">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-green-600">chat</span>
+                <h4 class="font-semibold text-slate-900">WhatsApp Version</h4>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-lg">
+                <p class="text-sm text-slate-700 whitespace-pre-line"><%= @whatsapp %></p>
+              </div>
+              <button class="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
+                      onclick="navigator.clipboard.writeText('<%= j @whatsapp %>'); alert('Copied!');">
+                <span class="material-symbols-outlined text-sm align-middle">content_copy</span> Copy
+              </button>
+            </div>
+            
+            <!-- SEO Version -->
+            <div class="p-4 rounded-xl border border-slate-200">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="material-symbols-outlined text-purple-600">search</span>
+                <h4 class="font-semibold text-slate-900">SEO Optimized Version</h4>
+              </div>
+              <div class="p-4 bg-slate-50 rounded-lg">
+                <p class="text-sm text-slate-700"><%= @seo %></p>
+              </div>
+              <button class="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
+                      onclick="navigator.clipboard.writeText('<%= j @seo %>'); alert('Copied!');">
+                <span class="material-symbols-outlined text-sm align-middle">content_copy</span> Copy
+              </button>
+            </div>
+          </div>
+        <% else %>
+          <div class="h-full flex flex-col items-center justify-center text-center">
+            <span class="material-symbols-outlined text-slate-300 text-6xl mb-4">auto_awesome</span>
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">No Content Generated Yet</h3>
+            <p class="text-slate-500 max-w-md">
+              Configure your generation settings on the left and click "Generate Marketing Kit" to create AI-powered content.
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyAllDescriptions() {
+    <% if @professional.present? %>
+      const text = `<%= j @professional %>\n\n<%= j @whatsapp %>\n\n<%= j @seo %>`;
+      navigator.clipboard.writeText(text);
+      alert('All descriptions copied to clipboard!');
+    <% end %>
+  }
+</script>

@@ -1,0 +1,274 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900"><%= @property.title %></h2>
+      <p class="text-slate-500 mt-1">
+        <span class="material-symbols-outlined text-sm align-middle">location_on</span>
+        <%= @property.colony_name %> - Plot <%= @property.plot_number %>
+      </p>
+    </div>
+    <div class="flex gap-3">
+      <%= link_to edit_property_path(@property), class: "btn-secondary flex items-center gap-2" do %>
+        <span class="material-symbols-outlined">edit</span>
+        Edit Property
+      <% end %>
+      <%= link_to properties_path, class: "btn-secondary flex items-center gap-2" do %>
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <!-- Main Content -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- Property Images -->
+    <div class="card overflow-hidden">
+      <% if @property.images.attached? %>
+        <div id="propertyCarousel" class="relative">
+          <div class="aspect-video bg-slate-100">
+            <%= image_tag @property.images.first, class: "w-full h-full object-cover" %>
+          </div>
+          
+          <% if @property.images.count > 1 %>
+            <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+                    onclick="previousSlide()">
+              <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+            <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-lg"
+                    onclick="nextSlide()">
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          <% end %>
+          
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            <% @property.images.each_with_index do |image, index| %>
+              <button class="w-2 h-2 rounded-full <%= index == 0 ? 'bg-white' : 'bg-white/50' %>" 
+                      onclick="goToSlide(<%= index %>)"></button>
+            <% end %>
+          </div>
+        </div>
+        
+        <!-- Image Thumbnails -->
+        <% if @property.images.count > 1 %>
+          <div class="p-4 border-t border-slate-200">
+            <p class="text-xs font-medium text-slate-500 mb-3"><%= @property.images.count %> Photos</p>
+            <div class="flex gap-2 overflow-x-auto">
+              <% @property.images.each_with_index do |image, index| %>
+                <button class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-colors"
+                        onclick="goToSlide(<%= index %>)">
+                  <%= image_tag image, class: "w-full h-full object-cover" %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center">
+          <span class="material-symbols-outlined text-slate-400 text-6xl mb-4">imagesmode</span>
+          <p class="text-slate-500 font-medium">No images uploaded</p>
+          <p class="text-slate-400 text-sm mt-1">Add photos to showcase the property</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Property Details -->
+    <div class="card p-6">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-green-600">info</span>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900">Property Details</h3>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="p-4 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-slate-400 text-sm">tag</span>
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Plot Number</p>
+          </div>
+          <p class="text-xl font-bold text-slate-900"><%= @property.plot_number %></p>
+        </div>
+        
+        <div class="p-4 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-slate-400 text-sm">location_on</span>
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Colony</p>
+          </div>
+          <p class="text-xl font-bold text-slate-900"><%= @property.colony_name %></p>
+        </div>
+        
+        <div class="p-4 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-slate-400 text-sm">square_foot</span>
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Size</p>
+          </div>
+          <p class="text-xl font-bold text-slate-900"><%= number_with_delimiter(@property.size) %> <span class="text-sm font-normal text-slate-500">sq ft</span></p>
+        </div>
+        
+        <div class="p-4 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-slate-400 text-sm">currency_rupee</span>
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Price</p>
+          </div>
+          <p class="text-xl font-bold text-green-600">₹<%= number_with_delimiter(@property.price) %></p>
+        </div>
+        
+        <div class="p-4 bg-slate-50 rounded-xl">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-slate-400 text-sm">status</span>
+            <p class="text-xs text-slate-500 uppercase tracking-wider">Status</p>
+          </div>
+          <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold
+            <%= @property.status == 'available' ? 'bg-green-100 text-green-700' : 
+                @property.status == 'sold' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' %>">
+            <span class="w-2 h-2 rounded-full 
+              <%= @property.status == 'available' ? 'bg-green-500' : 
+                  @property.status == 'sold' ? 'bg-red-500' : 'bg-yellow-500' %>"></span>
+            <%= @property.status.capitalize %>
+          </span>
+        </div>
+      </div>
+      
+      <% if @property.description.present? %>
+        <div class="mt-6 pt-6 border-t border-slate-200">
+          <h4 class="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-slate-400 text-sm">description</span>
+            Description
+          </h4>
+          <p class="text-slate-600 leading-relaxed"><%= simple_format(@property.description) %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="space-y-6">
+    <!-- AI Tools Card -->
+    <div class="card p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-purple-200 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-purple-700">auto_awesome</span>
+        </div>
+        <h3 class="text-lg font-semibold text-purple-900">AI Marketing Tools</h3>
+      </div>
+      <p class="text-sm text-purple-800 mb-4">Generate professional marketing content in seconds</p>
+      <div class="space-y-3">
+        <%= link_to ai_generator_description_path(property_id: @property.id), 
+            class: "flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 transition-colors group" do %>
+          <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+            <span class="material-symbols-outlined text-purple-600">pencil</span>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-900">Property Description</p>
+            <p class="text-xs text-slate-500">Generate listing copy</p>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 ml-auto">arrow_forward</span>
+        <% end %>
+        
+        <%= link_to ai_generator_social_post_path(property_id: @property.id), 
+            class: "flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 transition-colors group" do %>
+          <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+            <span class="material-symbols-outlined text-purple-600">share</span>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-900">Social Media Post</p>
+            <p class="text-xs text-slate-500">Instagram & Facebook</p>
+          </div>
+          <span class="material-symbols-outlined text-slate-400 ml-auto">arrow_forward</span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Buyer Info (if sold) -->
+    <% if @property.buyer.present? %>
+      <div class="card p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-green-200 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined text-green-700">person_check</span>
+          </div>
+          <h3 class="text-lg font-semibold text-green-900">Buyer Information</h3>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-green-200 flex items-center justify-center">
+              <span class="text-sm font-bold text-green-700"><%= @property.buyer.name.split.map(&:first).join %></span>
+            </div>
+            <div>
+              <p class="font-semibold text-slate-900"><%= @property.buyer.name %></p>
+              <p class="text-xs text-slate-500"><%= @property.buyer.phone %></p>
+            </div>
+          </div>
+          <div class="p-3 bg-white rounded-lg border border-green-100">
+            <p class="text-xs text-slate-500 mb-1">Sale Price</p>
+            <p class="text-lg font-bold text-green-600">₹<%= number_with_delimiter(@property.buyer.sale_price) %></p>
+          </div>
+          <%= link_to buyer_path(@property.buyer), class: "btn-primary w-full flex items-center justify-center gap-2" do %>
+            <span class="material-symbols-outlined text-sm">visibility</span>
+            View Full Details
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Upload Images -->
+    <div class="card p-6">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-blue-600">imagesmode</span>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-900">Add Photos</h3>
+      </div>
+      <%= form_with model: @property, local: true, html: { multipart: true } do |f| %>
+        <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-primary transition-colors bg-slate-50">
+          <%= f.file_field :images, multiple: true, class: "hidden", id: "upload_images", accept: "image/*" %>
+          <label for="upload_images" class="cursor-pointer">
+            <span class="material-symbols-outlined text-slate-400 text-4xl mb-2">cloud_upload</span>
+            <p class="text-sm font-medium text-slate-700">Click to upload</p>
+            <p class="text-xs text-slate-500">PNG, JPG up to 10MB</p>
+          </label>
+        </div>
+        <%= f.submit "Upload Images", class: "btn-primary w-full mt-3" %>
+      <% end %>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="card p-6 border-red-200 bg-red-50">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 bg-red-200 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-700">warning</span>
+        </div>
+        <h3 class="text-lg font-semibold text-red-900">Danger Zone</h3>
+      </div>
+      <p class="text-sm text-red-800 mb-4">Once deleted, this property cannot be recovered.</p>
+      <%= button_to property_path(@property), 
+          method: :delete, 
+          class: "w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-red-300 rounded-lg text-red-700 font-medium hover:bg-red-100 transition-colors",
+          data: { confirm: "Are you sure you want to delete this property? This action cannot be undone." } do %>
+        <span class="material-symbols-outlined">delete</span>
+        Delete Property
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slides = <%= @property.images.count %>;
+  
+  function goToSlide(index) {
+    currentSlide = index;
+    // Add your slide navigation logic here
+  }
+  
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % slides;
+    goToSlide(currentSlide);
+  }
+  
+  function previousSlide() {
+    currentSlide = (currentSlide - 1 + slides) % slides;
+    goToSlide(currentSlide);
+  }
+</script>

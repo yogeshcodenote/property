@@ -1,0 +1,136 @@
+<div class="mb-8">
+  <h2 class="text-2xl font-bold tracking-tight text-slate-900">
+    Colony Map: <%= @selected_colony || "Select a Colony" %>
+  </h2>
+  <p class="text-slate-500 mt-1">Real-time availability for your colonies.</p>
+</div>
+
+<!-- Colony Selection -->
+<div class="card p-4 mb-6">
+  <div class="flex items-center gap-2 flex-wrap">
+    <span class="text-sm font-medium text-slate-600 mr-2">Select Colony:</span>
+    <% @colony_names.each do |colony| %>
+      <%= link_to colony_map_path(colony: colony), 
+          class: "text-xs font-medium px-4 py-2 rounded-lg transition-colors #{colony == @selected_colony ? 'bg-primary text-slate-900' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}" do %>
+        <%= colony %>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<% if @selected_colony %>
+  <!-- Status Legend -->
+  <div class="card p-4 mb-6">
+    <div class="flex items-center gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 rounded bg-green-500 border-2 border-green-600"></div>
+        <span class="text-sm font-medium text-slate-600">AVAILABLE</span>
+        <span class="text-sm font-semibold text-green-600"><%= @properties.available.count %></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 rounded bg-red-500 border-2 border-red-600"></div>
+        <span class="text-sm font-medium text-slate-600">SOLD</span>
+        <span class="text-sm font-semibold text-red-600"><%= @properties.sold.count %></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 rounded bg-yellow-500 border-2 border-yellow-600"></div>
+        <span class="text-sm font-medium text-slate-600">RESERVED</span>
+        <span class="text-sm font-semibold text-yellow-600"><%= @properties.reserved.count %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Plot Grid -->
+    <div class="lg:col-span-2">
+      <div class="card p-6">
+        <h3 class="text-lg font-semibold text-slate-900 mb-4">Phase 1: Residential Plots</h3>
+        <p class="text-sm text-slate-500 mb-6">Real-time availability for South Wing sector.</p>
+        
+        <div class="grid grid-cols-6 md:grid-cols-8 gap-3">
+          <% @properties.order(:plot_number).each do |property| %>
+            <%= link_to property_path(property), 
+                class: "aspect-square flex items-center justify-center rounded-lg border-2 text-sm font-semibold transition-all hover:scale-105 #{
+                  property.status == 'available' ? 'bg-green-50 border-green-500 text-green-700 hover:bg-green-100' :
+                  property.status == 'sold' ? 'bg-red-50 border-red-500 text-red-700 hover:bg-red-100' :
+                  'bg-yellow-50 border-yellow-500 text-yellow-700 hover:bg-yellow-100'
+                }" do %>
+              <div class="text-center">
+                <div><%= property.plot_number.gsub(/\D/, '').first(3) || property.plot_number %></div>
+                <% if property.status == 'sold' %>
+                  <div class="text-[10px] font-medium mt-0.5">SOLD</div>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+        
+        <% if @properties.empty? %>
+          <div class="p-12 text-center">
+            <span class="material-symbols-outlined text-slate-300 text-6xl mb-4">map</span>
+            <p class="text-slate-500">No plots found in <%= @selected_colony %>.</p>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Map Placeholder -->
+      <div class="card p-6 mt-6">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-slate-900">Location Map</h3>
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-xs font-medium text-slate-600">LIVE INVENTORY VIEW</span>
+          </div>
+        </div>
+        <div class="h-64 bg-slate-100 rounded-xl flex items-center justify-center border-2 border-dashed border-slate-300">
+          <div class="text-center">
+            <span class="material-symbols-outlined text-slate-400 text-5xl mb-2">location_on</span>
+            <p class="text-slate-500 text-sm"><%= @selected_colony %> Location</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plot Details Sidebar -->
+    <div class="lg:col-span-1">
+      <div class="card p-6 sticky top-0">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-slate-900">Plot Details</h3>
+          <span class="text-xs text-slate-500">Click a plot to view details</span>
+        </div>
+        
+        <div class="space-y-4">
+          <% @properties.order(:plot_number).take(5).each do |property| %>
+            <div class="p-3 rounded-lg border border-slate-200 hover:border-primary cursor-pointer transition-colors" 
+                 onclick="window.location='<%= property_path(property) %>'">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm font-semibold text-slate-900"><%= property.plot_number %></span>
+                <span class="badge badge-<%= property.status == 'available' ? 'success' : property.status == 'sold' ? 'danger' : 'warning' %>">
+                  <%= property.status.capitalize %>
+                </span>
+              </div>
+              <div class="flex items-center justify-between text-xs text-slate-500">
+                <span><%= number_with_delimiter(property.size) %> sq ft</span>
+                <span class="font-semibold text-slate-900">₹<%= number_with_delimiter(property.price) %></span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        
+        <% if @properties.count > 5 %>
+          <%= link_to "View All #{@properties.count} Plots", properties_path, class: "btn-secondary w-full mt-4 text-center block" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="card p-12 text-center">
+    <span class="material-symbols-outlined text-slate-300 text-6xl mb-4">map</span>
+    <h3 class="text-lg font-semibold text-slate-900 mb-2">Select a Colony</h3>
+    <p class="text-slate-500 mb-6">Choose a colony from the list above to view the plot layout and availability.</p>
+    <%= link_to new_property_path, class: "btn-primary inline-flex items-center gap-2" do %>
+      <span class="material-symbols-outlined">add</span>
+      Add First Property
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,148 @@
+<div class="mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold tracking-tight text-slate-900">
+        <% if current_user.buyer_user? %>
+          Available Properties
+        <% else %>
+          Property Inventory
+        <% end %>
+      </h2>
+      <p class="text-slate-500 mt-1">
+        <% if current_user.buyer_user? %>
+          Browse available properties for purchase
+        <% else %>
+          Manage and track all properties in your portfolio
+        <% end %>
+      </p>
+    </div>
+    <% if current_user.admin_user? %>
+      <%= link_to new_property_path, class: "btn-primary flex items-center gap-2" do %>
+        <span class="material-symbols-outlined">add</span>
+        Add Property
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<!-- Search and Filters -->
+<div class="card p-4 mb-6">
+  <div class="flex gap-4">
+    <div class="flex-1">
+      <label class="block text-xs font-medium text-slate-500 mb-1">Search Property</label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+        <input type="text" placeholder="Search by name or ID..." class="input-field pl-10">
+      </div>
+    </div>
+    <% if current_user.admin_user? %>
+    <div class="w-48">
+      <label class="block text-xs font-medium text-slate-500 mb-1">Status</label>
+      <select class="input-field">
+        <option>All Statuses</option>
+        <option>Available</option>
+        <option>Sold</option>
+        <option>Reserved</option>
+      </select>
+    </div>
+    <div class="w-48">
+      <label class="block text-xs font-medium text-slate-500 mb-1">Colony Name</label>
+      <select class="input-field">
+        <option>All Colonies</option>
+        <% Property.select(:colony_name).distinct.order(:colony_name).each do |property| %>
+          <option><%= property.colony_name %></option>
+        <% end %>
+      </select>
+    </div>
+    <div class="flex items-end">
+      <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50">
+        <span class="material-symbols-outlined text-slate-600">filter_list</span>
+      </button>
+    </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<% if current_user.admin_user? %>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+  <div class="card p-4">
+    <p class="text-xs text-slate-500 uppercase tracking-wider">Total Plots</p>
+    <p class="text-2xl font-bold text-slate-900 mt-1"><%= @properties.count %></p>
+  </div>
+  <div class="card p-4">
+    <p class="text-xs text-slate-500 uppercase tracking-wider">Available</p>
+    <p class="text-2xl font-bold text-green-600 mt-1"><%= @available_count %></p>
+  </div>
+  <div class="card p-4">
+    <p class="text-xs text-slate-500 uppercase tracking-wider">Sold</p>
+    <p class="text-2xl font-bold text-red-600 mt-1"><%= @sold_count %></p>
+  </div>
+  <div class="card p-4">
+    <p class="text-xs text-slate-500 uppercase tracking-wider">Reserved</p>
+    <p class="text-2xl font-bold text-yellow-600 mt-1"><%= @reserved_count %></p>
+  </div>
+</div>
+<% end %>
+
+<!-- Properties Table -->
+<div class="card overflow-hidden">
+  <table class="w-full">
+    <thead class="bg-slate-50 border-b border-slate-200">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Plot #</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Colony</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Size (sq ft)</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
+        <% if current_user.admin_user? %>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+        <% end %>
+        <th class="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      <% @properties.each do |property| %>
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-6 py-4">
+            <span class="text-sm font-semibold text-slate-900"><%= property.plot_number %></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="text-sm text-slate-600"><%= property.colony_name %></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="text-sm text-slate-600"><%= number_with_delimiter(property.size) %></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="text-sm font-semibold text-slate-900">₹<%= number_with_delimiter(property.price) %></span>
+          </td>
+          <% if current_user.admin_user? %>
+          <td class="px-6 py-4">
+            <span class="badge badge-<%= property.status == 'available' ? 'success' : property.status == 'sold' ? 'danger' : 'warning' %>">
+              <%= property.status.capitalize %>
+            </span>
+          </td>
+          <% end %>
+          <td class="px-6 py-4">
+            <div class="flex items-center justify-end gap-2">
+              <%= link_to property_path(property), class: "p-2 hover:bg-slate-100 rounded-lg transition-colors", title: "View" do %>
+                <span class="material-symbols-outlined text-slate-600">visibility</span>
+              <% end %>
+              <% if current_user.admin_user? %>
+              <%= link_to edit_property_path(property), class: "p-2 hover:bg-slate-100 rounded-lg transition-colors", title: "Edit" do %>
+                <span class="material-symbols-outlined text-slate-600">edit</span>
+              <% end %>
+              <% end %>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% if @properties.empty? %>
+    <div class="p-12 text-center">
+      <span class="material-symbols-outlined text-slate-300 text-6xl mb-4">domain</span>
+      <p class="text-slate-500">No properties found.</p>
+    </div>
+  <% end %>
+</div>
